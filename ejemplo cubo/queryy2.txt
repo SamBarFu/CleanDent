@@ -1,0 +1,45 @@
+--create database NorthwindDW2019
+--use Northwind
+use NorthwindDW2019
+
+--Creacion de ShipCity
+select distinct o.ShipCountry, o.ShipCity 
+into ShipCity 
+from Northwind.dbo.Orders o 
+
+--Creacion de DimDate
+select * 
+into DimDate
+from Northwind.dbo.DimDate
+
+--Creacion de DimProduct
+select *
+into DimProduct
+from Northwind.dbo.Products
+
+--Creacion de DimCategories
+select *
+into DimCategories
+from Northwind.dbo.Categories
+
+--Creacion de tabla de hechos FactOrders
+
+
+
+Select 
+o.ShipCity,
+o.orderdate as Fecha,
+p.ProductId,
+round(sum(od.Quantity * od.UnitPrice),2) as MontoTotal, 
+round(sum((od.Quantity * od.UnitPrice) - (od.Quantity * od.UnitPrice * od.Discount)),
+round(sum(od.Quantity * od.UnitPrice * od.Discount),2)) as descuentos
+into FactOrders
+from Northwind.dbo.[Order Details] od
+inner join Northwind.dbo.Products p
+ON p.ProductID=od.ProductID
+inner join Northwind.dbo.Orders o
+on o.OrderId=od.OrderID
+Group by 
+o.orderDate,
+p.ProductID,
+o.ShipCity
